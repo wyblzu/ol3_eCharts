@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ol3-Echarts</title>
+    <style>
+        html, body, #map {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <link rel="stylesheet" href="plugin/ol3/ol.css" type="text/css">
+
+</head>
+<body>
+<div id="map"></div>
+<script src="plugin/ol3/ol.js"></script>
+<script src="plugin/jquery-2.1.1.min.js"></script>
+<script src="plugin/echarts-all.js"></script>
+<script src="js/OpenLayer3Ext.js"></script>
+<script>
+    $(document).ready(function () {
+
+        var map = new ol.Map({
+            target: 'map',
+            controls: [],
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: [0, 0],
+                zoom: 2
+            })
+        });
+
+        var option = {
+            color: ['red', 'blue'],
+            title: {
+                text: '模拟迁徙',
+//                subtext: '数据纯属虚构',
+                x: 'center',
+                textStyle: {
+                    color: '#202020'
+                }
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: function (v) {
+                    return v[1].replace(':', ' > ');
+                }
+            },
+            dataRange: {
+                min: 0,
+                max: 100,
+                range: {
+                    start: 10,
+                    end: 90
+                },
+                x: 'right',
+                calculable: true,
+                color: ['red', 'blue'],
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            series: [
+                {
+                    name: '上海',
+                    type: 'map',
+                    mapType: 'none',
+                    data: [],
+                    geoCoord: {
+                        '上海': [121.4648, 31.2891],
+                        '重庆': [107.7539,30.1904]
+                    },
+                    markLine: {
+                        smooth: true,
+                        effect: {
+                            show: false,
+                            scaleSize: 1,
+                            period: 30,
+                            color: '#ff0000',
+                            shadowBlur: 10
+                        },
+                        itemStyle: {
+                            normal: {
+                                borderWidth: 0.5,
+                                lineStyle: {
+                                    type: 'solid',
+                                    shadowBlur: 10
+                                }
+                            }
+                        },
+                        data: [
+                            [{name: '上海'}, {name: '重庆', value: 50}],
+                        ]
+                    },
+                    markPoint: {
+                        symbol: 'emptyCircle',
+                        symbolSize: function (v) {
+                            return 10 + v / 10
+                        },
+                        effect: {
+                            show: true,
+                            shadowBlur: 0
+                        },
+                        itemStyle: {
+                            normal: {
+                                label: {show: false}
+                            }
+                        },
+                        data: [
+                            {name: '重庆', value: 50}
+                        ]
+                    }
+                },
+                {
+                    name: '重庆',
+                    type: 'map',
+                    mapType: 'none',
+                    data: [],
+                    geoCoord: {
+                        '重庆': [107.7539,30.1904],
+                        '上海': [121.4648, 31.2891]
+                    },
+                    markLine: {
+                        smooth: true,
+                        effect: {
+                            show: false,
+                            scaleSize: 1,
+                            period: 30,
+                            color: '#ff0000',
+                            shadowBlur: 10
+                        },
+                        itemStyle: {
+                            normal: {
+                                borderWidth: 0.5,
+                                lineStyle: {
+                                    type: 'solid',
+                                    shadowBlur: 10
+                                }
+                            }
+                        },
+                        data: [
+                            [{name: '重庆'}, {name: '上海', value: 60}],
+                        ]
+                    },
+                    markPoint: {
+                        symbol: 'emptyCircle',
+                        symbolSize: function (v) {
+                            return 10 + v / 10
+                        },
+                        effect: {
+                            show: true,
+                            shadowBlur: 0
+                        },
+                        itemStyle: {
+                            normal: {
+                                label: {show: false}
+                            }
+                        },
+                        data: [
+                            {name: '上海', value: 60}
+                        ]
+                    }
+                }
+            ]
+        };
+        var olMapExt;
+        map.once('postrender', function (e) {
+            if (olMapExt !== undefined)
+                return;
+            olMapExt = new OpenLayer3Ext(map, echarts);
+            var container = olMapExt.getEchartsContainer();
+            var myChart = olMapExt.initECharts(container);
+            window.onresize = myChart.resize;
+            olMapExt.setOption(option, true);
+        })
+    })
+</script>
+</body>
+</html>
